@@ -7,7 +7,7 @@ var http = require('http'),
     mime = require('mime'),
     exec = require('child_process').exec,
     cli = require('cli'),
-    build = require('../build/main.js'),
+    build = require('../builder/main.js'),
     staticResponse = require('./staticResponse/render.js');
 
 exports.serve = function(opt){

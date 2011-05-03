@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var cli = require('cli').enable('status'),
-  build = require('./build/main.js'),
+  build = require('./builder/main.js'),
   serve = require('./serve/main.js'),
   fs = require('fs');
 
