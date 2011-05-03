@@ -1,0 +1,7 @@
+{
+    "name": "hs-builder",
+    "version": "0.1.0",
+    "description": "Hipsell build and serve",
+    "author": "defrex",
+    "bin": {"hsb": "./main.js"},
+}
