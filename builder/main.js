@@ -66,7 +66,7 @@ var build = function(opt, buildClbk){
             if (step == null) return writeOutput();
 
             cli.info('Starting build step: '+ step.name);
-            step.build(srcDir, buildDir, function(err, result){
+            step.build(opt, function(err, result){
               if (err) return errOut(err);
               if (typeof result == 'object')
                 updateOutput(result);

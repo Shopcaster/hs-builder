@@ -5,12 +5,12 @@ var fs = require('fs'),
 
 exports.name = 'Images';
 
-exports.build = function(srcDir, buildDir, clbk){
-  wrench.copyDirRecursive(srcDir+'/img', buildDir+'/img', function(err){
+exports.build = function(opt, clbk){
+  wrench.copyDirRecursive(opt.src+'/img', opt.build+'/img', function(err){
     if (err) return clbk(err);
-    fs.readFile(srcDir+'/img/favicon.ico', function(err, data){
+    fs.readFile(opt.src+'/img/favicon.ico', function(err, data){
       if (err) return clbk(err);
-      fs.writeFile(buildDir+'/favicon.ico', data, clbk);
+      fs.writeFile(opt.build+'/favicon.ico', data, clbk);
     });
   });
 };

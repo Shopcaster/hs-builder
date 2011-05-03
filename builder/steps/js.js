@@ -5,9 +5,9 @@ var fs = require('fs'),
 
 exports.name = 'JavaScript';
 
-exports.build = function(srcDir, buildDir, clbk){
-  srcDir = srcDir+'/js';
-  buildDir = buildDir+'/js';
+exports.build = function(opt, clbk){
+  var srcDir = opt.src+'/js',
+      buildDir = opt.build+'/js';
   fs.mkdir(buildDir, 0766, function(err){
     if (err) return clbk(err);
     exec(__dirname+'/../../lib/js.py -j '+srcDir, function(err, order){

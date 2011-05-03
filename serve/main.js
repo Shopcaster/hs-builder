@@ -12,7 +12,7 @@ var http = require('http'),
 
 exports.serve = function(opt){
   mime.define({
-      'text/cache-manifest': ['appcache', 'appCache'],
+    'text/cache-manifest': ['appcache', 'appCache'],
   });
 
   var onRequest = function (req, res) {
@@ -60,7 +60,7 @@ exports.serve = function(opt){
 
   (function waitForChange(){
     exec('inotifywait -r '+opt.src, function(){
-      build.build(function(){
+      build.build(opt, function(){
         // setver.close();
         // server = http.createServer(onRequest).listen(3000, '0.0.0.0');
         waitForChange();

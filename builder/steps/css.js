@@ -6,12 +6,14 @@ var fs = require('fs'),
 
 exports.name = 'CSS';
 
-exports.build = function(srcDir, buildDir, clbk){
-  var buildCss = buildDir+'/css',
-      srcCss = srcDir+'/css';
+exports.build = function(opt, clbk){
+  var buildCss = opt.build+'/css',
+      srcCss = opt.src+'/css';
 
+  cli.debug('buildCss:'+buildCss+' srcCss:'+srcCss);
   fs.mkdir(buildCss, 0766, function(){
-    cmd = 'sass --update '+srcCss+':'+buildCss;
+    var cmd = 'sass --update '+srcCss+':'+buildCss;
+    cli.debug('CSS command: '+cmd);
     exec(cmd, function(err, stdout, stderr){
       if (err) cli.fatal(stdout+' '+stderr);
       fs.readdir(buildCss, function(err, files){
