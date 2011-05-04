@@ -4,7 +4,7 @@ var _ = require('underscore')._,
     cli = require('cli'),
     fs = require('fs'),
     wrench = require('wrench'),
-    steps = [ // add build steps here:
+    buildSteps = [ // add build steps here:
       require('./steps/css.js'),
       require('./steps/js.js'),
       require('./steps/img.js'),
@@ -26,7 +26,7 @@ exports.run = function(opt, buildClbk){
         head: '',
         body: '',
       },
-      steps = steps.slice(0);
+      steps = buildSteps.slice(0);
 
   var writeOutput = _.once(function(){
     cli.info('Writing results to file.');
@@ -38,7 +38,7 @@ exports.run = function(opt, buildClbk){
       html = html.replace('</body>', buildOutput.body+'</body>');
       fs.writeFile(buildDir+'/index.html', html, function(){
         cli.info('Done');
-        buildClbk(null);
+        if (buildClbk) buildClbk(null);
       });
     });
   });
@@ -78,7 +78,11 @@ exports.run = function(opt, buildClbk){
   });
 
   function errOut(err){
-    cli.error(err);
-    buildClbk(err);
+    if (buildClbk){
+      cli.error(err);
+      buildClbk(err);
+    }else{
+      cli.fatal(err);
+    }
   }
 };
