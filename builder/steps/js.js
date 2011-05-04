@@ -6,19 +6,23 @@ var fs = require('fs'),
 
 exports.name = 'JavaScript';
 
-exports.options = {};
+exports.options = {
+  test: ['t', 'Build js with tests'],
+};
 
 exports.build = function(opt, clbk){
   var srcDir = opt.src+'/js',
-      buildDir = opt.build+'/js';
+      buildDir = opt.build+'/js',
+      op = '';
+  if (opt.test) op = '<h1 id="qunit-header">QUnit example</h1><h2 id="qunit-banner"></h2><div id="qunit-testrunner-toolbar"></div><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol><div id="qunit-fixture">test markup, will be hidden</div>'
+
   fs.mkdir(buildDir, 0766, function(err){
     if (err) return clbk(err);
     resolveDependancies(srcDir, function(err, files){
       if (err) return clbk(err);
-      var op = '',
-          done = _.after(files.length, function(){clbk(null, {body: op})});
+      var done = _.after(files.length, function(){clbk(null, {body: op})});
       _.each(files, function(file){
-        if (/\.js$/.test(file)){
+        if (/(?!_test)\.js$/.test(file) || (opt.test && /_test\.js$/.test(file))){
           op += '<script src="js'+file.replace(srcDir, '')+'"></script>';
           fs.readFile(file, function(err, data){
             if (err) return clbk(err);
