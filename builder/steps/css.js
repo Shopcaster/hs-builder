@@ -12,7 +12,6 @@ exports.build = function(opt, clbk){
   var buildCss = opt.build+'/css',
       srcCss = opt.src+'/css';
 
-  cli.debug('buildCss:'+buildCss+' srcCss:'+srcCss);
   fs.mkdir(buildCss, 0766, function(){
     var cmd = 'sass --update '+srcCss+':'+buildCss;
     cli.debug('CSS command: '+cmd);

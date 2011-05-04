@@ -24,7 +24,7 @@ exports.run = function(opt){
     var uri = url.parse(req.url).pathname,
         filename = path.join(opt.build, uri);
 
-    if (staticResponse.render(req, res)) return;
+    if (staticResponse.render(req, res, opt)) return;
 
     path.exists(filename, function(exists) {
       if(!exists) {
@@ -66,12 +66,11 @@ exports.run = function(opt){
   (function waitForChange(){
     exec('inotifywait -r '+opt.src, function(){
       build.run(opt, function(){
-        // setver.close();
-        // server = http.createServer(onRequest).listen(3000, '0.0.0.0');
+        cli.info('http://'+opt.address+':'+opt.port+'/');
         waitForChange();
       });
     });
   })();
 
-  cli.info('Server running at http://'+opt.address+':'+opt.port+'/');
+  cli.info('Server started at http://'+opt.address+':'+opt.port+'/');
 }

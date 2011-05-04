@@ -8,10 +8,13 @@ var _ = require('underscore')._,
       require('./steps/css.js'),
       require('./steps/js.js'),
       require('./steps/img.js'),
+      //should come after anything that modifies the build dir
       require('./steps/appCache.js'),
     ];
 
-exports.options = {};
+exports.options = _.reduce(buildSteps, function(ops, step){
+  return _.extend(ops, step.options);
+}, {});
 
 exports.run = function(opt, buildClbk){
   if (typeof opt == 'function'){
@@ -78,8 +81,8 @@ exports.run = function(opt, buildClbk){
   });
 
   function errOut(err){
+    cli.debug('build error: '+err);
     if (buildClbk){
-      cli.error(err);
       buildClbk(err);
     }else{
       cli.fatal(err);
