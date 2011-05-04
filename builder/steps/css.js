@@ -6,6 +6,8 @@ var fs = require('fs'),
 
 exports.name = 'CSS';
 
+exports.options = {};
+
 exports.build = function(opt, clbk){
   var buildCss = opt.build+'/css',
       srcCss = opt.src+'/css';

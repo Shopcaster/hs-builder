@@ -5,6 +5,8 @@ var fs = require('fs'),
 
 exports.name = 'JavaScript';
 
+exports.options = {};
+
 exports.build = function(opt, clbk){
   var srcDir = opt.src+'/js',
       buildDir = opt.build+'/js';
@@ -13,8 +15,8 @@ exports.build = function(opt, clbk){
     exec(__dirname+'/../../lib/js.py -j '+srcDir, function(err, order){
       if (err) return clbk(err);
       var op = '',
-        files = JSON.parse(order),
-        done = _.after(files.length, function(){clbk(null, {body: op})});
+          files = JSON.parse(order),
+          done = _.after(files.length, function(){clbk(null, {body: op})});
       _.each(files, function(file){
         if (/\.js$/.test(file)){
           op += '<script src="js'+file.replace(srcDir, '')+'"></script>';

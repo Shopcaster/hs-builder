@@ -5,6 +5,8 @@ var fs = require('fs'),
 
 exports.name = 'Application Cache';
 
+exports.options = {};
+
 exports.build = function(opt, clbk){
     var manifestFile = opt.build+'/'+manifestFilename,
         manifest = '';

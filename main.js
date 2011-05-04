@@ -1,26 +1,30 @@
 #!/usr/bin/env node
 
 var cli = require('cli').enable('status'),
-  build = require('./builder/main.js'),
-  serve = require('./serve/main.js'),
-  fs = require('fs');
+    fs = require('fs'),
+    _ = require('underscore')._;
 
-cli.parse({
-  port:  ['p', 'Serve on port', 'number', 3000],
-  src: ['s', 'Source directory', 'path', './src'],
-  build: ['b', 'Build directory', 'path', './build'],
-}, ['build', 'serve']);
+var commands = {
+  'build': require('./builder/main.js'),
+  'serve': require('./serve/main.js'),
+  'test': require('./test/main.js'),
+}
+
+cli.parse(
+  // extend global options with the options member of each command module
+  _.reduce(commands, function(ops, cmd){
+    return _.extend(ops, cmd.options);
+  }, { // global options
+    src: ['s', 'Source directory', 'path', './src'],
+    build: ['b', 'Build directory', 'path', './build'],
+  }),
+  _.keys(commands)
+);
 
 cli.main(function(args, opt){
   cleanOpt(opt, function(opt){
-    cli.debug('using options: '+ JSON.stringify(opt));
-    if (cli.command == 'build'){
-      cli.info('Building...');
-      build.build(opt);
-    }else if (cli.command == 'serve'){
-      cli.info('Serving...');
-      serve.serve(opt);
-    }
+    cli.debug('options: '+ JSON.stringify(opt));
+    commands[cli.command].run(opt);
   });
 });
 

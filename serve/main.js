@@ -8,9 +8,13 @@ var http = require('http'),
     exec = require('child_process').exec,
     cli = require('cli'),
     build = require('../builder/main.js'),
-    staticResponse = require('./staticResponse/render.js');
+    staticResponse = require('./shebang/render.js');
 
-exports.serve = function(opt){
+exports.options = {
+  port:  ['p', 'Serve on port', 'number', 3000],
+};
+
+exports.run = function(opt){
   mime.define({
     'text/cache-manifest': ['appcache', 'appCache'],
   });
@@ -60,7 +64,7 @@ exports.serve = function(opt){
 
   (function waitForChange(){
     exec('inotifywait -r '+opt.src, function(){
-      build.build(opt, function(){
+      build.run(opt, function(){
         // setver.close();
         // server = http.createServer(onRequest).listen(3000, '0.0.0.0');
         waitForChange();

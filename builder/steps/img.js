@@ -5,6 +5,8 @@ var fs = require('fs'),
 
 exports.name = 'Images';
 
+exports.options = {};
+
 exports.build = function(opt, clbk){
   wrench.copyDirRecursive(opt.src+'/img', opt.build+'/img', function(err){
     if (err) return clbk(err);
