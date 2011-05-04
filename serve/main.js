@@ -11,6 +11,7 @@ var http = require('http'),
     staticResponse = require('./shebang/render.js');
 
 exports.options = {
+  address:  ['a', 'Address to serve on', 'string', '0.0.0.0'],
   port:  ['p', 'Serve on port', 'number', 3000],
 };
 
@@ -60,7 +61,7 @@ exports.run = function(opt){
     };
   };
 
-  var server = http.createServer(onRequest).listen(opt.port, '0.0.0.0');
+  var server = http.createServer(onRequest).listen(opt.port, opt.address);
 
   (function waitForChange(){
     exec('inotifywait -r '+opt.src, function(){
@@ -72,5 +73,5 @@ exports.run = function(opt){
     });
   })();
 
-  cli.info('Server running at http://0.0.0.0:'+opt.port+'/');
+  cli.info('Server running at http://'+opt.address+':'+opt.port+'/');
 }
