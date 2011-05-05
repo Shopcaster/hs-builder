@@ -17,8 +17,7 @@ exports.build = function(opt, clbk){
 
   manifest += 'CACHE MANIFEST\n';
   manifest += '#built: '+ Math.round(new Date().getTime() / 1000) +'\n\n';
-  // manifest += 'NETWORK:\n';
-  // manifest += 'http://maps.google.com/*\n\n';
+  manifest += 'NETWORK:\n*\n\n';
   manifest += 'CACHE:\n';
 
   listDirectory(opt.build, function(err, result){
