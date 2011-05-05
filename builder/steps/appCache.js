@@ -1,56 +1,63 @@
 
 var fs = require('fs'),
-    _ = require('underscore')._,
-    manifestFilename = 'manifest.appcache';
+  _ = require('underscore')._,
+  manifestFilename = 'manifest.appcache';
 
 exports.name = 'Application Cache';
 
-exports.options = {};
+exports.options = {
+  'no-appcache': [false, 'Disable HTML5 Application Cache', 'boolean', false]
+};
 
 exports.build = function(opt, clbk){
-    var manifestFile = opt.build+'/'+manifestFilename,
-        manifest = '';
+  if (opt['no-appcache']) return clbk(null, {});
 
-    manifest += 'CACHE MANIFEST\n';
-    manifest += '#built: '+ Math.round(new Date().getTime() / 1000) +'\n\n';
+  var manifestFile = opt.build+'/'+manifestFilename,
+    manifest = '';
 
-    listDirectory(opt.build, function(err, result){
+  manifest += 'CACHE MANIFEST\n';
+  manifest += '#built: '+ Math.round(new Date().getTime() / 1000) +'\n\n';
+  // manifest += 'NETWORK:\n';
+  // manifest += 'http://maps.google.com/*\n\n';
+  manifest += 'CACHE:\n';
 
-        manifest += _.map(result, function(file){
-            return file.replace(opt.build+'/', '');
-        }).join('\n');
+  listDirectory(opt.build, function(err, result){
 
-        fs.writeFile(manifestFile, manifest, function(){
-            clbk(null, {htmlAttr: 'manifest="'+manifestFilename+'"'});
-        });
+    manifest += _.map(result, function(file){
+      return file.replace(opt.build+'/', '');
+    }).join('\n');
+
+    fs.writeFile(manifestFile, manifest, function(){
+      clbk(null, {htmlAttr: 'manifest="'+manifestFilename+'"'});
     });
+  });
 };
 
 function listDirectory(dir, clbk){
-    var result = [];
-    fs.readdir(dir, function(err, files){
-        if (err) return clbk(err);
-        var done = _.after(files.length+1, function(){
-            clbk(null, result);
-        });
-        done();
-        _.each(files, function(filename){
-            var file = dir+'/'+filename;
-            fs.stat(file, function(err, stat){
-                if (err) return clbk(err);
-                if (stat.isDirectory())
-                    listDirectory(file, function(err, subResult){
-                        if (err) return clbk(err);
-                        result = result.concat(subResult);
-                        done();
-                    });
-                else if (filename == manifestFilename)
-                    done();
-                else{
-                    result.push(file);
-                    done();
-                }
-            });
-        });
+  var result = [];
+  fs.readdir(dir, function(err, files){
+    if (err) return clbk(err);
+    var done = _.after(files.length+1, function(){
+      clbk(null, result);
     });
+    done();
+    _.each(files, function(filename){
+      var file = dir+'/'+filename;
+      fs.stat(file, function(err, stat){
+        if (err) return clbk(err);
+        if (stat.isDirectory())
+          listDirectory(file, function(err, subResult){
+            if (err) return clbk(err);
+            result = result.concat(subResult);
+            done();
+          });
+        else if (filename == manifestFilename)
+          done();
+        else{
+          result.push(file);
+          done();
+        }
+      });
+    });
+  });
 };

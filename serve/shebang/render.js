@@ -3,7 +3,9 @@ var _ = require('underscore')._,
     url = require('url'),
     exec = require('child_process').exec;
 
-exports.render = function(req, res, opt){
+exports.name = 'Shebang static renderer';
+exports.options = {};
+exports.run = function(req, res, opt){
   if (req.method != 'GET') return false;
   var reqUrl = url.parse(req.url, true),
       fragment = reqUrl.query._escaped_fragment_;

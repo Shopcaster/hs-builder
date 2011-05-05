@@ -7,13 +7,19 @@ var http = require('http'),
     mime = require('mime'),
     exec = require('child_process').exec,
     cli = require('cli'),
+    _ = require('underscore')._
     build = require('../builder/main.js'),
-    staticResponse = require('./shebang/render.js');
+    handlers = [
+      require('./shebang/render.js'),
+      require('./apiProxy.js')
+    ];
 
-exports.options = {
+exports.options = _.reduce(handlers, function(ops, handler){
+  return _.extend(ops, handler.options);
+}, {
   address:  ['a', 'Address to serve on', 'string', '0.0.0.0'],
   port:  ['p', 'Serve on port', 'number', 3000],
-};
+});
 
 exports.run = function(opt){
   mime.define({
@@ -24,7 +30,11 @@ exports.run = function(opt){
     var uri = url.parse(req.url).pathname,
         filename = path.join(opt.build, uri);
 
-    if (staticResponse.render(req, res, opt)) return;
+    if (_.any(handlers, function(handler){
+      cli.debug('Serve: trying handler: '+handler.name);
+      return handler.run(req, res, opt);
+    })) return;
+    cli.debug('Serve: serving static');
 
     path.exists(filename, function(exists) {
       if(!exists) {

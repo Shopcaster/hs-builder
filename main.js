@@ -7,7 +7,16 @@ var cli = require('cli').enable('status'),
 var commands = {
   'build': require('./builder/main.js'),
   'serve': require('./serve/main.js'),
-  'test': require('./test/main.js'),
+  'test': { // require('./test/main.js'),
+    run: function(opt){
+      opt.test = true
+      commands.build.run(opt, function(){
+        commands.serve.run(opt);
+      });
+    },
+    name: 'Test',
+    options: {}
+  }
 }
 
 cli.parse(

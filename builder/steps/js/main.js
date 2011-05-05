@@ -7,14 +7,26 @@ var fs = require('fs'),
 exports.name = 'JavaScript';
 
 exports.options = {
-  test: ['t', 'Build js with tests'],
+  test: ['t', 'Build js with tests', 'boolean', false],
 };
 
 exports.build = function(opt, clbk){
   var srcDir = opt.src+'/js',
       buildDir = opt.build+'/js',
       op = '';
-  if (opt.test) op = '<h1 id="qunit-header">QUnit example</h1><h2 id="qunit-banner"></h2><div id="qunit-testrunner-toolbar"></div><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol><div id="qunit-fixture">test markup, will be hidden</div>'
+  if (opt.test){
+    var fail = function(err){if (err) cli.fatal(err)};
+    copyFile(__dirname+'/qunit/qunit.js', buildDir+'/qunit.js', fail);
+    copyFile(__dirname+'/qunit/qunit.css', opt.build+'/css/qunit.css', fail);
+    op += '<script src="js/qunit.js"></script>'
+         +'<link rel="stylesheet" type="text/css" href="css/qunit.css">'
+         +'<h1 id="qunit-header">QUnit example</h1>'
+         +'<h2 id="qunit-banner"></h2>'
+         +'<div id="qunit-testrunner-toolbar"></div>'
+         +'<h2 id="qunit-userAgent"></h2>'
+         +'<ol id="qunit-tests"></ol>'
+         +'<div id="qunit-fixture">test markup, will be hidden</div>';
+  }
 
   fs.mkdir(buildDir, 0766, function(err){
     if (err) return clbk(err);
@@ -22,16 +34,12 @@ exports.build = function(opt, clbk){
       if (err) return clbk(err);
       var done = _.after(files.length, function(){clbk(null, {body: op})});
       _.each(files, function(file){
-        if (/(?!_test)\.js$/.test(file) || (opt.test && /_test\.js$/.test(file))){
+        // Javascript doesn't support negative lookbehinds in regex,
+        // but it does support negaive lookaheads!
+        var elif = file.split('').reverse().join('');
+        if (/^sj\.(?!tset_)/.test(elif) || (opt.test && /_test\.js$/.test(file))){
           op += '<script src="js'+file.replace(srcDir, '')+'"></script>';
-          fs.readFile(file, function(err, data){
-            if (err) return clbk(err);
-            var newFilename = file.replace(srcDir, buildDir),
-                newPath = newFilename.split('/').slice(0, -1).join('/');
-            exec('mkdir -p '+newPath, function(){
-              fs.writeFile(file.replace(srcDir, buildDir), data, done);
-            });
-          });
+          copyFile(file, file.replace(srcDir, buildDir), done);
         }else if (/\.tmpl$/.test(file)){
           fs.readFile(file, 'utf8', function(err, tmpl){
             if (err) return clbk(err);
@@ -136,4 +144,14 @@ function resolveDepList(depList, clbk){
     });
   }
   clbk(null, resolvedList);
+}
+
+function copyFile(from, to, clbk){
+  fs.readFile(from, function(err, data){
+    if (err && clbk) return clbk(err);
+    else if (err) return;
+    exec('mkdir -p '+to.split('/').slice(0, -1).join('/'), function(){
+      fs.writeFile(to, data, clbk);
+    });
+  });
 }

@@ -6,7 +6,7 @@ var _ = require('underscore')._,
     wrench = require('wrench'),
     buildSteps = [ // add build steps here:
       require('./steps/css.js'),
-      require('./steps/js.js'),
+      require('./steps/js/main.js'),
       require('./steps/img.js'),
       //should come after anything that modifies the build dir
       require('./steps/appCache.js'),
