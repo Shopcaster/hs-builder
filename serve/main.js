@@ -73,11 +73,14 @@ exports.run = function(opt){
 
   var server = http.createServer(onRequest).listen(opt.port, opt.address);
 
-  (function waitForChange(){
-    exec('inotifywait -r '+opt.src, function(){
+  (function(){
+    exec('inotifywait -r '+opt.src, function(err){
+      //if there's no inotifywait, bail on the auto-refresh
+      if (err) return;
+
       build.run(opt, function(){
         cli.info('http://'+opt.address+':'+opt.port+'/');
-        waitForChange();
+        arguments.callee();
       });
     });
   })();
