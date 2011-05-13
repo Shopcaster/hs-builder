@@ -43,7 +43,10 @@ exports.build = function(opt, clbk){
         }else if (/\.tmpl$/.test(file)){
           fs.readFile(file, 'utf8', function(err, tmpl){
             if (err) return clbk(err);
+            var name = /\/([\w-]+)\.tmpl$/.exec(file)[1];
+            op += '<script id="'+name+'" type="text/html">'
             op += tmpl;
+            op += '</script>'
             done();
           });
         }else{
@@ -129,7 +132,7 @@ function resolveDepList(depList, clbk){
       maxRevs = 200;
   while(_.size(depList)){
     if (revs++ >= maxRevs)
-      return clbk('Unable to resolve the following after '+revs+' revs: '
+      return clbk('Unable to resolve the following dependancies after '+revs+' revs:\n'
           +JSON.stringify(_.keys(depList)));
 
     _.each(depList, function(deps, file){
