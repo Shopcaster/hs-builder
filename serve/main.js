@@ -73,7 +73,7 @@ exports.run = function(opt){
 
   var server = http.createServer(onRequest).listen(opt.port, opt.address);
 
-  (function waitForChange()(){
+  (function waitForChange(){
     exec('inotifywait -r '+opt.src, function(err){
       //if there's no inotifywait, bail on the auto-refresh
       if (err) return;
