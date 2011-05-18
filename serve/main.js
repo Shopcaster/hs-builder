@@ -19,6 +19,7 @@ exports.options = _.reduce(handlers, function(ops, handler){
 }, {
   address:  ['a', 'Address to serve on', 'string', '0.0.0.0'],
   port:  ['p', 'Serve on port', 'number', 3000],
+  'no-autorestart':  [false, 'Disable autorestart on file change', 'boolean', false],
 });
 
 exports.run = function(opt){
@@ -73,17 +74,18 @@ exports.run = function(opt){
 
   var server = http.createServer(onRequest).listen(opt.port, opt.address);
 
-  (function waitForChange(){
-    exec('inotifywait -r '+opt.src, function(err){
-      //if there's no inotifywait, bail on the auto-refresh
-      if (err) return;
+  if (!opt['no-autorestart'])
+    (function waitForChange(){
+      exec('inotifywait -r '+opt.src, function(err){
+        //if there's no inotifywait, bail on the auto-refresh
+        if (err) return;
 
-      build.run(opt, function(){
-        cli.info('http://'+opt.address+':'+opt.port+'/');
-        waitForChange();
+        build.run(opt, function(){
+          cli.info('http://'+opt.address+':'+opt.port+'/');
+          waitForChange();
+        });
       });
-    });
-  })();
+    })();
 
   cli.info('Server started at http://'+opt.address+':'+opt.port+'/');
 }
