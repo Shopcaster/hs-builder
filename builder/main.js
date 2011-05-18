@@ -5,6 +5,7 @@ var _ = require('underscore')._,
     fs = require('fs'),
     wrench = require('wrench'),
     buildSteps = [ // add build steps here:
+      require('./steps/conf.js'),
       require('./steps/css.js'),
       require('./steps/js/main.js'),
       require('./steps/img.js'),
