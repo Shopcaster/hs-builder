@@ -46,11 +46,11 @@ exports.run = function(opt){
       }
 
       fs.stat(filename, function(err, stat){
-        if (err) return errEnd();
+        if (err) return errEnd('Something wrong with stat: ' + err);
         if (stat.isDirectory()) filename += '/index.html';
 
         fs.readFile(filename, 'binary', function(err, file) {
-          if (err) return errEnd();
+          if (err) return errEnd('Unable to read file ' + filename);
 
           res.writeHead(200, {'Content-Type': mime.lookup(filename)});
           res.write(file, 'binary');

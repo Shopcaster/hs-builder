@@ -1,6 +1,6 @@
 {
     "name": "hs-builder",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Hipsell build and serve",
     "author": "defrex",
     "bin": {"hsb": "./main.js"},
