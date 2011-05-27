@@ -131,9 +131,35 @@ function resolveDepList(depList, clbk){
       revs = 0,
       maxRevs = 200;
   while(_.size(depList)){
-    if (revs++ >= maxRevs)
-      return clbk('Unable to resolve the following dependancies after '+revs+' revs:\n'
-          +JSON.stringify(_.keys(depList)));
+    if (revs++ == maxRevs){
+      var unmet = {};
+      var unmetReverse = {};
+      _.each(depList, function(deps, file){
+        unmet[file] = _.reduce(deps, function(unmet, dep){
+          if (!_.include(resolvedList, dep)){
+            unmet.push(dep);
+            unmetReverse[dep] = unmetReverse[dep] || [];
+            unmetReverse[dep].push(file);
+          }
+          return unmet;
+        }, []);
+      });
+      var unresolved = _(unmet).chain().values().flatten().unique().value();
+      var pending = _.keys(depList);
+      var unavailable = _.reduce(unresolved, function(left, dep){
+        if (_.indexOf(pending, dep) == -1)
+          left.push(dep);
+        return left;
+      }, []);
+      var needed = {};
+      _.each(unmetReverse, function(files, dep){
+        if (_.indexOf(unavailable, dep) > -1)
+          needed[dep] = files;
+      });
+
+      return clbk('Unable to find dependancies ({missing file: [needs file, ..]}): '
+          +JSON.stringify(needed, null, 2));
+    }
 
     _.each(depList, function(deps, file){
       var isMet = deps.length == 0;
