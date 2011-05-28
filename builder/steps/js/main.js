@@ -49,6 +49,22 @@ exports.build = function(opt, clbk){
             op += '</script>'
             done();
           });
+        }else if (/\.haml$/.test(file)){
+          fs.readFile(file, 'utf8', function(err, tmpl){
+            if (err) return clbk(err);
+            var name = /\/([\w-]+)\.haml$/.exec(file)[1];
+            var cmd = 'haml '+file;
+            cli.debug('HAML command: '+cmd);
+            exec(cmd, function(err, stdout, stderr){
+              if (err) return clbk(err);
+              tmpl = stdout;
+              cli.debug('Rendered HAML: '+tmpl);
+              op += '<script id="'+name+'" type="text/html">'
+              op += tmpl;
+              op += '</script>'
+              done();
+            });
+          });
         }else{
           done();
         }
