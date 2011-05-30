@@ -74,7 +74,8 @@ exports.run = function(opt){
 
   var server = http.createServer(onRequest).listen(opt.port, opt.address);
 
-  if (!opt['no-autorestart'])
+  if (!opt['no-autorestart']){
+    build.run(opt);
     (function waitForChange(){
       exec('inotifywait -r '+opt.src, function(err){
         //if there's no inotifywait, bail on the auto-refresh
@@ -86,6 +87,7 @@ exports.run = function(opt){
         });
       });
     })();
+  }
 
   cli.info('Server started at http://'+opt.address+':'+opt.port+'/');
 }
