@@ -7,16 +7,17 @@ var cli = require('cli').enable('status'),
 var commands = {
   'build': require('./builder/main.js'),
   'serve': require('./serve/main.js'),
-  'test': { // require('./test/main.js'),
-    run: function(opt){
-      opt.test = true
-      commands.build.run(opt, function(){
-        commands.serve.run(opt);
-      });
-    },
-    name: 'Test',
-    options: {}
-  }
+  'test': require('./test/main.js'),
+  // {
+  //   run: function(opt){
+  //     opt.test = true
+  //     commands.build.run(opt, function(){
+  //       commands.serve.run(opt);
+  //     });
+  //   },
+  //   name: 'Test',
+  //   options: {}
+  // }
 }
 
 cli.parse(
@@ -25,7 +26,7 @@ cli.parse(
     return _.extend(ops, cmd.options);
   }, { // global options
     src: ['s', 'Source directory', 'path', './src'],
-    build: ['b', 'Build directory', 'path', './build'],
+    build: ['b', 'Build directory', 'path', './build']
   }),
   _.keys(commands)
 );
