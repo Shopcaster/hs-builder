@@ -81,7 +81,8 @@ exports.run = function(opt){
           //if there's no inotifywait, bail on the auto-refresh
           if (err) return;
 
-          build.run(opt, function(){
+          build.run(opt, function(err){
+            if (err) cli.fatal(err);
             cli.info('http://'+opt.address+':'+opt.port+'/');
             waitForChange();
           });
