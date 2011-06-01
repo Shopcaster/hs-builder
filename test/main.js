@@ -22,11 +22,11 @@ exports.run = function(opt){
     ]);
 
     testRunner.stdout.on('data', function(data){
-      console.log(''+data);
+      process.stdout.write(''+data);
     });
 
     testRunner.stderr.on('data', function(data){
-      console.log(''+data);
+      process.stdout.write(''+data);
     });
 
     testRunner.on('exit', function (code) {

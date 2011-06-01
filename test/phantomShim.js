@@ -5,8 +5,10 @@ if (!phantom.state){
 }
 
 $(function(){
+  hs.log.disable();
+
   QUnit.moduleStart = function(obj){
-    console.log(obj.name);
+    console.log(''+obj.name+'\n');
   }
   QUnit.testStart = function(obj){
     console.log('  '+obj.name);
@@ -20,11 +22,10 @@ $(function(){
     console.log(op);
   }
   QUnit.testDone = function(obj){
-    console.log('  '+obj.failed+' failed, '+obj.passed+' passed.');
+    console.log('  '+obj.failed+' failed, '+obj.passed+' passed.\n');
   }
   QUnit.moduleDone = function(obj){
-    console.log('Done: '+obj.name);
-    console.log(obj.failed+' failed, '+obj.passed+' passed.');
+    console.log(obj.failed+' failed, '+obj.passed+' passed.\n\n');
   }
   QUnit.done = function(obj){
     console.log(obj.total+' test run in '+obj.runtime+' miliseconds.');
