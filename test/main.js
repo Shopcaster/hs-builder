@@ -7,23 +7,16 @@ var _ = require('underscore')._,
     spawn = child_process.spawn,
     exec = child_process.exec;
 
-exports.options = {
-  dropdb: [false, 'Drop database by this name before testing', 'string', false]
-};
+exports.options = {};
 
 exports.run = function(opt){
-  opt.test = true
-  build.run(opt, function(){
-    opt['no-autorestart'] = true;
-    serve.run(opt);
+  opt['test'] = true;
+  opt['no-appcache'] = true;
+  opt['no-autorestart'] = true;
 
-    if (opt.dropdb)
-      exec('mongo '+opt.dropdb+' '+__dirname+'/mongoDropper.js', function(err){
-        if (err) cli.fatal(err.stack);
-        runTests(opt);
-      });
-    else
-      runTests(opt);
+  build.run(opt, function(){
+    serve.run(opt);
+    runTests(opt);
   });
 };
 

@@ -4,6 +4,7 @@ var _ = require('underscore')._,
     cli = require('cli'),
     fs = require('fs'),
     wrench = require('wrench'),
+    exec = require('child_process').exec,
     buildSteps = [ // add build steps here:
       require('./steps/conf.js'),
       require('./steps/css.js'),
@@ -15,7 +16,9 @@ var _ = require('underscore')._,
 
 exports.options = _.reduce(buildSteps, function(ops, step){
   return _.extend(ops, step.options);
-}, {});
+}, {
+  dropdb: [false, 'Drop database by this name before building', 'string', false]
+});
 
 exports.run = function(opt, buildClbk){
   if (typeof opt == 'function'){
@@ -53,33 +56,43 @@ exports.run = function(opt, buildClbk){
     });
   };
 
-  fs.realpath(buildDir, function(err, fullBuildDir){
-    if (err) return errOut(err);
-    buildDir = fullBuildDir;
-    fs.realpath(srcDir, function(err, fullSrcDir){
+  var startBuild = function(){
+    fs.realpath(buildDir, function(err, fullBuildDir){
       if (err) return errOut(err);
-      srcDir = fullSrcDir;
-      // rm -rf buildDir && mkdir buildDir
-      wrench.rmdirRecursive(buildDir, function(err){
+      buildDir = fullBuildDir;
+      fs.realpath(srcDir, function(err, fullSrcDir){
         if (err) return errOut(err);
-        fs.mkdir(buildDir, 0766, function(err){
+        srcDir = fullSrcDir;
+        // rm -rf buildDir && mkdir buildDir
+        wrench.rmdirRecursive(buildDir, function(err){
           if (err) return errOut(err);
-          (function doStep(){
-            var step = steps.shift();
-            if (step == null) return writeOutput();
+          fs.mkdir(buildDir, 0766, function(err){
+            if (err) return errOut(err);
+            (function doStep(){
+              var step = steps.shift();
+              if (step == null) return writeOutput();
 
-            cli.info('Starting build step: '+ step.name);
-            step.build(opt, function(err, result){
-              if (err) return errOut(err);
-              if (typeof result == 'object')
-                updateOutput(result);
-              doStep();
-            });
-          })();
+              cli.info('Starting build step: '+ step.name);
+              step.build(opt, function(err, result){
+                if (err) return errOut(err);
+                if (typeof result == 'object')
+                  updateOutput(result);
+                doStep();
+              });
+            })();
+          });
         });
       });
     });
-  });
+  };
+
+  if (opt.dropdb)
+    exec('mongo '+opt.dropdb+' '+__dirname+'/mongoDropper.js', function(err){
+      if (err) cli.fatal(err);
+      startBuild();
+    });
+  else
+    startBuild();
 
   function errOut(err){
     cli.debug('build error: '+err);
