@@ -14,6 +14,9 @@ exports.run = function(opt){
   opt['no-appcache'] = true;
   opt['no-autorestart'] = true;
 
+  if (!opt.verbose)
+    cli.status = function (msg, type) {}
+
   build.run(opt, function(){
     serve.run(opt);
     runTests(opt);

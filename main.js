@@ -27,17 +27,23 @@ cli.parse(
   }, { // global options
     src: ['s', 'Source directory', 'path', './src'],
     build: ['b', 'Build directory', 'path', './build'],
-    verbose: ['v', 'Print more', 'boolean', false]
+    verbose: ['v', 'Print more', 'boolean', false],
+    silent: ['s', 'stop output', 'boolean', false]
   }),
   _.keys(commands)
 );
 
 cli.main(function(args, opt){
+  if (opt.silent)
+    cli.status = function (msg, type) {}
+
   cleanOpt(opt, function(opt){
     cli.debug('options: '+ JSON.stringify(opt));
     commands[cli.command].run(opt);
   });
 });
+
+
 
 function cleanOpt(opt, clbk){
   fs.realpath(opt.build, function(err, buildPath){
