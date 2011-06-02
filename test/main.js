@@ -18,7 +18,7 @@ exports.run = function(opt){
     serve.run(opt);
 
     if (opt.dropdb)
-      exec('mongo test '+__dirname+'/mongoDropper.js', function(err){
+      exec('mongo '+opt.dropdb+' '+__dirname+'/mongoDropper.js', function(err){
         if (err) cli.fatal(err.stack);
         runTests(opt);
       });
@@ -30,7 +30,8 @@ exports.run = function(opt){
 function runTests(opt){
   var testRunner = spawn('phantomjs', [
     __dirname+'/phantomShim.js',
-    'http://'+opt.address+':'+opt.port+'/'
+    'http://'+opt.address+':'+opt.port+'/',
+    opt.verbose ? '-v' : '',
   ]);
 
   testRunner.stdout.on('data', function(data){
@@ -60,6 +61,8 @@ function color(string){
       lines[i] = stylize(lines[i], 'red');
     else if (/passed:/.test(lines[i]))
       lines[i] = stylize(lines[i], 'green');
+    else if (/^http.*\.js:\d+/.test(lines[i]))
+      lines[i] = stylize(lines[i], 'grey');
   }
   return lines.join('\n');
 }

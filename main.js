@@ -26,7 +26,8 @@ cli.parse(
     return _.extend(ops, cmd.options);
   }, { // global options
     src: ['s', 'Source directory', 'path', './src'],
-    build: ['b', 'Build directory', 'path', './build']
+    build: ['b', 'Build directory', 'path', './build'],
+    verbose: ['v', 'Print more', 'boolean', false]
   }),
   _.keys(commands)
 );
