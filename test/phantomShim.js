@@ -40,12 +40,10 @@ if (!phantom.state){
 }else{
   localStorage.clear();
 
-  $(function(){
-    if (phantom.args[1] == '-v')
-      hs.log.concat();
-    else
-      hs.log.disable();
+  if (phantom.args[1] == '-v')
+    hs.log.concat = true;
+  else
+    hs.log.disabled = true;
 
-    testConfig();
-  });
+  $(testConfig);
 }
