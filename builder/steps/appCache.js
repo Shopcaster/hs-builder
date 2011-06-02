@@ -10,7 +10,7 @@ exports.options = {
 };
 
 exports.build = function(opt, clbk){
-  if (opt['no-appcache']) return clbk(null, {});
+  if (opt['no-appcache'] || opt['test']) return clbk(null, {});
 
   var manifestFile = opt.build+'/'+manifestFilename,
     manifest = '';

@@ -2,10 +2,6 @@
 
 window.testConfig = function(){
 
-  QUnit.reset = function(){
-    localStorage.clear();
-  }
-
   QUnit.moduleStart = function(obj){
     console.log(''+obj.name+'\n');
   }

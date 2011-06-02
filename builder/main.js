@@ -89,6 +89,7 @@ exports.run = function(opt, buildClbk){
   if (opt.dropdb)
     exec('mongo '+opt.dropdb+' '+__dirname+'/mongoDropper.js', function(err){
       if (err) cli.fatal(err);
+      cli.info('Database dropped: '+opt.dropdb);
       startBuild();
     });
   else

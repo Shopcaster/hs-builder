@@ -24,6 +24,7 @@ exports.run = function(opt){
 };
 
 function runTests(opt){
+
   var testRunner = spawn('phantomjs', [
     __dirname+'/phantomShim.js',
     'http://'+opt.address+':'+opt.port+'/',
@@ -36,7 +37,7 @@ function runTests(opt){
 
   testRunner.stderr.on('data', function(data){
     if (/[WARNING]/.test(''+data)) return;
-    process.stderr.write('\033[31m'+data+'\033[39m');
+    process.stderr.write(stylize(data, 'red'));
   });
 
   testRunner.on('exit', function (code) {

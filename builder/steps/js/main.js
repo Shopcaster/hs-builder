@@ -19,7 +19,7 @@ exports.build = function(opt, clbk){
     copyFile(__dirname+'/qunit/qunit.js', buildDir+'/qunit.js', fail);
     copyFile(__dirname+'/qunit/qunit.css', opt.build+'/css/qunit.css', fail);
     op += '<script src="js/qunit.js"></script>'
-         +'<script> if (window.testConfig) window.testConfig();</script>'
+         +'<script>QUnit.reset = function(){localStorage.clear()}</script>'
          +'<link rel="stylesheet" type="text/css" href="css/qunit.css">'
          +'<h1 id="qunit-header">QUnit example</h1>'
          +'<h2 id="qunit-banner"></h2>'
