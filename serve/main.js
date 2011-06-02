@@ -10,8 +10,7 @@ var http = require('http'),
     _ = require('underscore')._
     build = require('../builder/main.js'),
     handlers = [
-      require('./shebang/render.js'),
-      require('./apiProxy.js')
+      require('./shebang/render.js')
     ];
 
 exports.options = _.reduce(handlers, function(ops, handler){

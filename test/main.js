@@ -3,41 +3,53 @@ var _ = require('underscore')._,
     cli = require('cli'),
     build = require('../builder/main.js'),
     serve = require('../serve/main.js'),
-    spawn = require('child_process').spawn;
+    child_process = require('child_process'),
+    spawn = child_process.spawn,
+    exec = child_process.exec;
 
-exports.options = {};
+exports.options = {
+  dropdb: [false, 'Drop database by this name before testing', 'string', false]
+};
 
 exports.run = function(opt){
   opt.test = true
-  cli.info('Building with tests:');
   build.run(opt, function(){
-    cli.info('\nRunning server:');
     opt['no-autorestart'] = true;
     serve.run(opt);
 
-    cli.info('\nRunning tests:\n');
-    var testRunner = spawn('phantomjs', [
-      __dirname+'/phantomShim.js',
-      'http://'+opt.address+':'+opt.port+'/'
-    ]);
-
-    testRunner.stdout.on('data', function(data){
-      process.stdout.write(color(''+data));
-    });
-
-    testRunner.stderr.on('data', function(data){
-      if (/[WARNING]/.test(''+data)) return;
-      process.stderr.write('\033[31m'+data+'\033[39m');
-    });
-
-    testRunner.on('exit', function (code) {
-      process.exit(code);
-    });
-    setTimeout(function(){
-      cli.fatal('Tests timed out after 10 seconds.');
-    }, 10000);
+    if (opt.dropdb)
+      exec('mongo test '+__dirname+'/mongoDropper.js', function(err){
+        if (err) cli.fatal(err.stack);
+        runTests(opt);
+      });
+    else
+      runTests(opt);
   });
 };
+
+function runTests(opt){
+  var testRunner = spawn('phantomjs', [
+    __dirname+'/phantomShim.js',
+    'http://'+opt.address+':'+opt.port+'/'
+  ]);
+
+  testRunner.stdout.on('data', function(data){
+    process.stdout.write(color(''+data));
+  });
+
+  testRunner.stderr.on('data', function(data){
+    if (/[WARNING]/.test(''+data)) return;
+    process.stderr.write('\033[31m'+data+'\033[39m');
+  });
+
+  testRunner.on('exit', function (code) {
+    process.exit(code);
+  });
+
+  setTimeout(function(){
+    cli.fatal('Testing timed out after 20 seconds.');
+  }, 20000);
+}
 
 function color(string){
   var lines = string.split('\n');
