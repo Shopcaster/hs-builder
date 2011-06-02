@@ -38,9 +38,9 @@ if (!phantom.state){
   phantom.state = true;
   phantom.open(phantom.args[0]);
 }else{
-  $(function(){
-    localStorage.clear();
+  localStorage.clear();
 
+  $(function(){
     if (phantom.args[1] == '-v')
       hs.log.concat();
     else
