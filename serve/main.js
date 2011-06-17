@@ -38,8 +38,7 @@ exports.run = function(opt){
 
     path.exists(filename, function(exists) {
       if(!exists) {
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.write('404 Not Found\n');
+        res.writeHead(301, {'Location': '/#!'+uri});
         end();
         return;
       }
