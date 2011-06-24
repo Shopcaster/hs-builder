@@ -10,14 +10,16 @@ exports.options = {
 };
 
 exports.build = function(opt, clbk){
-  if (opt['no-appcache'] || opt['test']) return clbk(null, {});
-
   var manifestFile = opt.build+'/'+manifestFilename,
     manifest = '';
 
   manifest += 'CACHE MANIFEST\n';
   manifest += '#built: '+ Math.round(new Date().getTime() / 1000) +'\n\n';
   manifest += 'NETWORK:\n*\n\n';
+
+  if (opt['no-appcache'] || opt['test'])
+    return fs.writeFile(manifestFile, manifest, _.bind(clbk, null, null, {}));
+
   manifest += 'CACHE:\n';
 
   listDirectory(opt.build, function(err, result){

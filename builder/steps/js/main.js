@@ -3,7 +3,8 @@ var fs = require('fs'),
     _ = require('underscore')._,
     cli = require('cli'),
     exec = require('child_process').exec,
-    ujs = require('uglify-js');
+    ujs = require('uglify-js'),
+    coffee = require('coffee-script');
     // ujsParse = require("uglify-js").parser,
     // ujsUglify = require("uglify-js").uglify;
 
@@ -59,32 +60,6 @@ exports.build = function(opt, clbk){
               op += tmplContent;
               op += '</script>'
               nextTmpl();
-            });
-          })();
-        else if (files.haml)
-          (function nextHaml(){
-            var file = files.haml.shift();
-
-            if (!file){
-              delete files.haml;
-              return scriptWrap(clbk);
-            }
-
-            fs.readFile(file, 'utf8', function(err, tmpl){
-              if (err) return clbk(err);
-              var name = /\/([\w-]+)\.haml$/.exec(file)[1];
-              tmplNames.push(name);
-              var cmd = 'haml '+file;
-              cli.debug('HAML command: '+cmd);
-              exec(cmd, function(err, stdout, stderr){
-                if (err) return clbk(err);
-                tmpl = stdout;
-                cli.debug('Rendered HAML: '+tmpl);
-                op += '<script id="'+name+'" type="text/html">'
-                op += tmpl;
-                op += '</script>'
-                nextHaml();
-              });
             });
           })();
         else if (files.js && !opt.minify)
@@ -164,12 +139,16 @@ function resolveDependancies(dir, clbk){
   createFileList(dir, function(err, fileList){
     if (err) return clbk(err);
     fileList = sortByExt(fileList);
-    makeDepList(dir, fileList.js, function(err, depList){
+    compileCoffee(fileList.coffee, function(err, newJS){
       if (err) return clbk(err);
-      resolveDepList(depList, function(err, resolvedFiles){
+      fileList.js.concat(newJS);
+      makeDepList(dir, fileList.js, function(err, depList){
         if (err) return clbk(err);
-        fileList.js = resolvedFiles;
-        clbk(null, fileList);
+        resolveDepList(depList, function(err, resolvedFiles){
+          if (err) return clbk(err);
+          fileList.js = resolvedFiles;
+          clbk(null, fileList);
+        });
       });
     });
   });
@@ -227,6 +206,32 @@ function sortByExt(files){
     }
   });
   return resp;
+}
+
+/**
+* compiles any .coffee files, and adds them to the javascript
+**/
+function compileCoffee(files, clbk){
+  var newJS = [];
+
+  if (_.isUndefined(files))
+    return clbk(null, newJS);
+
+  (function next(){
+    var script = files.pop();
+
+    if (!_.isString(script))
+      return clbk(null, newJS);
+
+    var jsName = script.replace(/\.coffee$/, '.js');
+
+    exec('coffee -c '+script+'', function(err){
+      if (err) return clbk(err);
+
+      newJS.push(jsName);
+      next();
+    });
+  })();
 }
 
 /**
