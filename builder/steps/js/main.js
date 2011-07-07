@@ -22,7 +22,7 @@ exports.build = function(opt, clbk) {
       if (err != null) {
         return typeof clbk === "function" ? clbk(err) : void 0;
       }
-      steps = [require('./compileCoffee'), require('./includeTmpl'), require('./includeDepends'), require('./includeTests'), require('./minifyJS')];
+      steps = [require('./copyJS'), require('./compileCoffee'), require('./includeTmpl'), require('./includeDepends'), require('./includeTests'), require('./minifyJS')];
       return (next = function(err, output, files) {
         var step;
         if (err != null) {

@@ -22,6 +22,7 @@ exports.build = (opt, clbk) ->
     return clbk?(err) if err?
 
     steps = [
+      require './copyJS'
       require './compileCoffee'
       require './includeTmpl'
       require './includeDepends'

@@ -13,21 +13,18 @@ exports.run = (srcDir, buildDir, files, output, opt, clbk) ->
       clbk null, output, files
 
   else
-    wrench.copyDirRecursive srcDir, buildDir, (err) ->
+    depends.manage buildDir, (err, files) ->
       if err? then return clbk err
 
-      depends.manage srcDir, (err, files) ->
+      files.writeClient "#{buildDir}/loader.js", false, (err) ->
         if err? then return clbk err
 
-        files.writeClient "#{buildDir}/loader.js", false, (err) ->
-          if err? then return clbk err
+        output.body += "<script src=\"js/loader.js\"></script>"
 
-          output.body += "<script src=\"js/loader.js\"></script>"
+        for file in files.output
+          if not /_test\.js/.test file
+            output.body += "<script src=\"js#{file}\"></script>"
 
-          for file in files.output
-            if not /_test\.js/.test file
-              output.body += "<script src=\"js#{file}\"></script>"
-
-          delete files.js
-          clbk null, output, files
+        delete files.js
+        clbk null, output, files
 

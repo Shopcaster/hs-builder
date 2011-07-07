@@ -12,30 +12,25 @@ exports.run = function(srcDir, buildDir, files, output, opt, clbk) {
       return clbk(null, output, files);
     });
   } else {
-    return wrench.copyDirRecursive(srcDir, buildDir, function(err) {
+    return depends.manage(buildDir, function(err, files) {
       if (err != null) {
         return clbk(err);
       }
-      return depends.manage(srcDir, function(err, files) {
+      return files.writeClient("" + buildDir + "/loader.js", false, function(err) {
+        var file, _i, _len, _ref;
         if (err != null) {
           return clbk(err);
         }
-        return files.writeClient("" + buildDir + "/loader.js", false, function(err) {
-          var file, _i, _len, _ref;
-          if (err != null) {
-            return clbk(err);
+        output.body += "<script src=\"js/loader.js\"></script>";
+        _ref = files.output;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          file = _ref[_i];
+          if (!/_test\.js/.test(file)) {
+            output.body += "<script src=\"js" + file + "\"></script>";
           }
-          output.body += "<script src=\"js/loader.js\"></script>";
-          _ref = files.output;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            file = _ref[_i];
-            if (!/_test\.js/.test(file)) {
-              output.body += "<script src=\"js" + file + "\"></script>";
-            }
-          }
-          delete files.js;
-          return clbk(null, output, files);
-        });
+        }
+        delete files.js;
+        return clbk(null, output, files);
       });
     });
   }

@@ -52,7 +52,9 @@ function listDirectory(dir, clbk){
             result = result.concat(subResult);
             done();
           });
-        else if (filename == manifestFilename)
+        else if (filename == manifestFilename ||
+            /\.coffee$/.test(filename) ||
+            /\.tmpl$/.test(filename))
           done();
         else{
           result.push(file);
