@@ -38,9 +38,10 @@ exports.run = function(opt){
 
     path.exists(filename, function(exists) {
       if(!exists) {
-        res.writeHead(301, {'Location': '/#!'+uri});
-        end();
-        return;
+        filename = opt.build;
+        // res.writeHead(301, {'Location': '/#!'+uri});
+        // end();
+        // return;
       }
 
       fs.stat(filename, function(err, stat){

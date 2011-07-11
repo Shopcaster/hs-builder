@@ -19,11 +19,11 @@ exports.run = (srcDir, buildDir, files, output, opt, clbk) ->
       files.writeClient "#{buildDir}/loader.js", false, (err) ->
         if err? then return clbk err
 
-        output.body += "<script src=\"js/loader.js\"></script>"
+        output.body += "<script src=\"/js/loader.js\"></script>"
 
         for file in files.output
           if not /_test\.js/.test file
-            output.body += "<script src=\"js#{file}\"></script>"
+            output.body += "<script src=\"/js#{file}\"></script>"
 
         delete files.js
         clbk null, output, files

@@ -25,7 +25,7 @@ exports.build = function(opt, clbk){
         _.each(files, function(file){
           if (/^[^_][\w-]+\.css$/.test(file)){
             output += '<link rel="stylesheet" type="text/css" href="';
-            output += 'css/'+file;
+            output += '/css/'+file;
             output += '">';
           }
           done();
