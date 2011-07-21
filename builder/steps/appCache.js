@@ -29,7 +29,7 @@ exports.build = function(opt, clbk){
     }).join('\n');
 
     fs.writeFile(manifestFile, manifest, function(){
-      clbk(null, {htmlAttr: 'manifest="'+manifestFilename+'"'});
+      clbk(null, {htmlAttr: 'manifest="/'+manifestFilename+'"'});
     });
   });
 };
